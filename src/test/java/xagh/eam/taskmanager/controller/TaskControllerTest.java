@@ -18,7 +18,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 
+@ActiveProfiles("test")
 public class TaskControllerTest {
 
     @Mock

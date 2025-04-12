@@ -1,35 +1,36 @@
-version: "3.8"
 services:
-  mariadb:
-    image: mariadb:10.5
-    restart: always
-    container_name: taskdb
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: task
-      MYSQL_USER: parcial_user
-      MYSQL_PASSWORD: parcial_password
-    volumes:
-      - db_data:/var/lib/mysql
-    expose:
-      - "3306:3306"
+    mariadb:
+        image: mariadb:10.5
+        restart: always
+        environment:
+            MARIADB_ROOT_PASSWORD: root
+            MARIADB_DATABASE: taskdb
+            MARIADB_USER: taskuser
+            MARIADB_PASSWORD: taskpassword
+        volumes:
+            - db_data:/var/lib/mysql
+            - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+        ports:
+            - "3306:3306"
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
 
-  taskmanager:
-    build: .
-    ports:
-      - "8088:8088"
-    depends_on:
-      - mariadb
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/task
-      SPRING_DATASOURCE_USERNAME: parcial_user
-      SPRING_DATASOURCE_PASSWORD: parcial_password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-    networks:
-      - appnet
+    taskmanager:
+        image: xagh/agiraldog
+        depends_on:
+            mariadb:
+                condition: service_healthy
+        environment:
+            SERVER_PORT: 8080
+            SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/taskdb?allowPublicKeyRetrieval=true&useSSL=false
+            SPRING_DATASOURCE_USERNAME: taskuser
+            SPRING_DATASOURCE_PASSWORD: taskpassword
+            SPRING_JPA_HIBERNATE_DDL_AUTO: update
+        ports:
+            - "8088:8080"
 
 volumes:
-  db_data:
-
-networks:
-  appnet:
+    db_data:

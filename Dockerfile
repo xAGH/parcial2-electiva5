@@ -1,10 +1,8 @@
-FROM gradle:8.5-jdk-22 AS builder
+FROM gradle:jdk AS builder
 WORKDIR /app
-COPY build.gradle settings.gradle gradle.properties ./ 
-COPY gradle ./gradle
-RUN gradle build --no-daemon || return 0
+COPY . .
 RUN gradle clean test jacocoTestReport --no-daemon
-RUN gradle build --no-daemon
+RUN gradle build -x test --no-daemon
 
 FROM eclipse-temurin:22-jdk
 WORKDIR /app

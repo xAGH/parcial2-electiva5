@@ -10,7 +10,7 @@ version = '0.0.1'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(22)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -69,4 +69,8 @@ tasks.register('copyCoverageReport', Copy) {
 tasks.register('copyTestReport', Copy) {
 	from "$buildDir/reports/tests/test"
 	into "$projectDir/src/main/resources/static/tests"
+}
+
+springBoot {
+    mainClass = 'xagh.eam.taskmanager.TaskmanagerApplication'
 }
